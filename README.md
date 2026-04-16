@@ -1,69 +1,36 @@
-# Biological Design Tools Index
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A live, searchable dashboard of AI-enabled biological tools — their capabilities, risk profiles, and relevance to different users.
+## Getting Started
 
-Based on the methodology from the [Global Risk Index for AI-enabled Biological Tools](https://doi.org/10.71172/wjyw-6dyc) (CLTR & RAND Europe, September 2025).
+First, run the development server:
 
-## Who is this for?
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-- **Policy folks:** See our categorisation of tools to understand dual-use risk across the landscape. Filter by composite risk score (Red / Amber / Green) to prioritise governance attention.
-- **Model developers:** See how your model ranks for misuse-relevant capability and maturity. Schedule a call with us to discuss which KYC / managed access tools may best fit your project.
-- **Biology researchers:** Choose your use case (protein engineering, pathogen property prediction, etc.) and see which tools are most relevant.
-- **Evaluators:** See which models have been tested against which misuse scenarios. Expand the corpus by attempting new use cases and reporting your findings.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## How it works
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1. We ingest research papers (via OpenAlex, arXiv, targeted search) and identify the AI-enabled biological tool.
-2. We match the tool against our database, or create a new entry.
-3. An AI API categorises the tool across the RAND/CLTR framework:
-   - **Category** (1 of 8): viral vector design, protein engineering, small biomolecule design, genetic modification & genome design, pathogen property prediction, host-pathogen interaction prediction, immune system modelling & vaccine design, experimental design / simulation / automation.
-   - **Misuse-relevant capability** (Very Low → Critical): scored against predefined misuse scenarios per category.
-   - **Maturity & availability** (1–5 across 5 dimensions): scientific maturity, market demand, regulatory landscape, funding, ease of access.
-   - **Composite score**: Red (recommend action) / Amber (consider action) / Green (monitor).
-4. Landscape metadata: country of origin, year of release, open-source status (code / weights / data), potential for change.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## What is this similar to?
+## Learn More
 
-- **Product Hunt** — people use it to find tools relevant for their job. This is similar, but for AI-enabled biology tools with a risk lens.
-- **There's an AI for That** — same concept of discovering AI tools by use case. We add biosecurity risk assessment on top.
-- **Neurosnap.ai** — a paid platform where you choose from hosted bio-AI tools. Our site is the free discovery + risk layer; Neurosnap is the paid execution layer.
+To learn more about Next.js, take a look at the following resources:
 
-## Data model
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-Each tool entry contains:
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-| Field | Type | Example |
-|---|---|---|
-| `name` | string | AlphaFold 3 |
-| `function` | string | Predicts structural interactions between proteins, nucleic acids, small molecules |
-| `categories` | string[] | ["protein_engineering"] |
-| `country` | string[] | ["GB", "US"] |
-| `year` | number | 2024 |
-| `open_source` | object | { code: true, weights: true, data: true } |
-| `misuse_capability` | enum | very_low / low / medium / high / critical |
-| `misuse_scenarios` | string[] | Scored scenarios from the RAND/CLTR rubric |
-| `maturity_availability` | number | 3.6 (average of 5 dimensions) |
-| `composite_score` | enum | red / amber / green |
-| `potential_for_change` | enum | small / moderate / large |
-| `paper_url` | string | Link to primary publication |
-| `repo_url` | string | Link to code repository |
-| `plain_summary` | string | AI-generated plain-language risk summary |
+## Deploy on Vercel
 
-## Tech stack
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-- **Frontend:** Next.js (App Router) + Tailwind CSS
-- **Database:** Supabase (Postgres)
-- **Ingestion pipeline:** OpenAlex API + Claude API for categorisation
-- **Deployment:** Vercel
-
-## Status
-
-Early development. Seeding with the 57 state-of-the-art tools from the RAND/CLTR Global Risk Index.
-
-## Licence
-
-MIT
-
-## Contact
-
-Joey Bream — joey@sentinelbio.org
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
