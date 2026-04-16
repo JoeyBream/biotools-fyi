@@ -4,6 +4,7 @@ import tools from '@/data/tools.json'
 import type { Tool } from '@/lib/types'
 import TagBadge from '@/components/TagBadge'
 import OpenSourceBadge from '@/components/OpenSourceBadge'
+import EvaluationSection from '@/components/EvaluationSection'
 
 const allTools = tools as Tool[]
 
@@ -146,6 +147,22 @@ export default async function ToolPage(props: PageProps<'/tools/[slug]'>) {
           </div>
         </div>
       </div>
+
+      {/* Evidence quality */}
+      {tool.evaluation ? (
+        <EvaluationSection evaluation={tool.evaluation} />
+      ) : (
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold">Evidence quality</h2>
+          <p className="mt-2 text-sm text-muted italic">
+            Not yet assessed.{' '}
+            <Link href="/methodology" className="underline hover:text-foreground">
+              See our methodology
+            </Link>{' '}
+            for how we evaluate tools.
+          </p>
+        </section>
+      )}
 
       {/* Links */}
       <div className="mt-8 flex flex-wrap gap-3">

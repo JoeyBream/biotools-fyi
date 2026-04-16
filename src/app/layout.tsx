@@ -36,6 +36,9 @@ export default function RootLayout({
               <Link href="/" className="hover:text-foreground transition-colors">
                 Directory
               </Link>
+              <Link href="/methodology" className="hover:text-foreground transition-colors">
+                Methodology
+              </Link>
               <a
                 href="https://github.com/JoeyBream/biotools-fyi"
                 target="_blank"

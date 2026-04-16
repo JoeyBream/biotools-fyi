@@ -11,7 +11,24 @@
     "repoUrl": "https://github.com/google-deepmind/alphafold3",
     "summary": "Google DeepMind's latest structure prediction model. Handles proteins, DNA, RNA, ligands, and ions in a single unified framework. Weights are available for academic use only under a restricted licence.",
     "developer": "Google DeepMind",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "predictive",
+      "evaluationLadderMax": 7,
+      "evaluationLadderDistribution": [2, 7],
+      "unitOfEvaluation": "Per-complex",
+      "unitIndependenceNote": "Evaluated on PoseBusters benchmark and CASP15 targets; some family-level redundancy possible",
+      "selectionFunnelRatio": null,
+      "pipelineComponents": ["Diffusion module", "Pairformer trunk", "Confidence head"],
+      "creditAssignment": "End-to-end model; all components novel vs AF2",
+      "failuresEnumerated": true,
+      "sotaBaselineNamed": "AlphaFold 2, RoseTTAFold-AA",
+      "ablationPresent": true,
+      "interventionalEvidence": false,
+      "statedScope": "All biomolecular complexes",
+      "effectiveScope": "Proteins, nucleic acids, small molecules, ions; best on protein–protein",
+      "dualUseNote": null
+    }
   },
   {
     "name": "AlphaFold 2",
@@ -25,7 +42,24 @@
     "repoUrl": "https://github.com/google-deepmind/alphafold",
     "summary": "The breakthrough model that solved the protein folding problem at CASP14. Fully open-sourced and widely adopted across structural biology. Powers the AlphaFold Protein Structure Database with 200M+ predicted structures.",
     "developer": "Google DeepMind",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "predictive",
+      "evaluationLadderMax": 7,
+      "evaluationLadderDistribution": [2, 7],
+      "unitOfEvaluation": "Per-structure (CASP target domains)",
+      "unitIndependenceNote": "CASP targets are curated for novelty; strong independence",
+      "selectionFunnelRatio": null,
+      "pipelineComponents": ["MSA processing", "Evoformer", "Structure module", "Recycling"],
+      "creditAssignment": "End-to-end model",
+      "failuresEnumerated": true,
+      "sotaBaselineNamed": "RoseTTAFold, trRosetta, CASP14 field",
+      "ablationPresent": true,
+      "interventionalEvidence": false,
+      "statedScope": "Single-chain protein structure prediction",
+      "effectiveScope": "Single-chain proteins; struggles with IDPs and some multimers",
+      "dualUseNote": null
+    }
   },
   {
     "name": "ESM-2",
@@ -39,7 +73,8 @@
     "repoUrl": "https://github.com/facebookresearch/esm",
     "summary": "Meta AI's flagship protein language model trained on 65M protein sequences. Available in sizes from 8M to 15B parameters. Widely used as a foundation for fine-tuning on specific protein tasks.",
     "developer": "Meta AI (FAIR)",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "ESMFold",
@@ -53,7 +88,8 @@
     "repoUrl": "https://github.com/facebookresearch/esm",
     "summary": "Built on ESM-2, ESMFold trades some accuracy for dramatically faster inference — predictions in seconds rather than minutes. Useful for rapid screening of large protein sets where AlphaFold would be too slow.",
     "developer": "Meta AI (FAIR)",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "RFdiffusion",
@@ -67,7 +103,24 @@
     "repoUrl": "https://github.com/RosettaCommons/RFdiffusion",
     "summary": "From the Baker Lab at UW. Applies denoising diffusion to protein backbone generation. Can design binders to target proteins, create symmetric oligomers, and generate scaffolds for functional motifs. A key tool in the computational protein design pipeline.",
     "developer": "Baker Lab (University of Washington)",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "generative",
+      "evaluationLadderMax": 8,
+      "evaluationLadderDistribution": [1, 2, 6, 7, 8],
+      "unitOfEvaluation": "Per-design",
+      "unitIndependenceNote": "Multiple designs per target; within-target designs are not independent",
+      "selectionFunnelRatio": "Hundreds of designs generated per target, tens experimentally tested",
+      "pipelineComponents": ["RFdiffusion (backbone generation)", "ProteinMPNN (sequence design)", "AF2 (in silico filter)"],
+      "creditAssignment": "Paper claims the diffusion backbone generator; ProteinMPNN and AF2 are fixed components",
+      "failuresEnumerated": true,
+      "sotaBaselineNamed": "Rosetta hallucination, trRosetta hallucination",
+      "ablationPresent": true,
+      "interventionalEvidence": false,
+      "statedScope": "General-purpose protein backbone generation",
+      "effectiveScope": "De novo monomers, binders, symmetric oligomers; less tested on membrane proteins or large complexes",
+      "dualUseNote": null
+    }
   },
   {
     "name": "ProteinMPNN",
@@ -81,7 +134,24 @@
     "repoUrl": "https://github.com/dauparas/ProteinMPNN",
     "summary": "Solves the inverse folding problem: given a desired 3D structure, what amino acid sequence will fold into it? Often used downstream of RFdiffusion — first generate a backbone, then use ProteinMPNN to find sequences for it.",
     "developer": "Baker Lab (University of Washington)",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "generative",
+      "evaluationLadderMax": 7,
+      "evaluationLadderDistribution": [1, 2, 6, 7],
+      "unitOfEvaluation": "Per-sequence",
+      "unitIndependenceNote": "Multiple sequences designed per backbone; recovery metrics use per-residue but aggregate per-sequence",
+      "selectionFunnelRatio": "8 sequences per backbone, all tested; no post-hoc filtering",
+      "pipelineComponents": ["ProteinMPNN (sequence design)", "AF2 (in silico validation)"],
+      "creditAssignment": "ProteinMPNN is the novel component; AF2 used for validation only",
+      "failuresEnumerated": true,
+      "sotaBaselineNamed": "Rosetta fixed-backbone design",
+      "ablationPresent": true,
+      "interventionalEvidence": false,
+      "statedScope": "Inverse folding for arbitrary protein backbones",
+      "effectiveScope": "Soluble monomers and some complexes; less validated on membrane proteins",
+      "dualUseNote": null
+    }
   },
   {
     "name": "RoseTTAFold 2",
@@ -95,7 +165,8 @@
     "repoUrl": "https://github.com/uw-ipd/RoseTTAFold2NA",
     "summary": "The Baker Lab's answer to AlphaFold for protein complexes. Uses a three-track neural network architecture that processes sequence, pairwise, and structure information simultaneously.",
     "developer": "Baker Lab (University of Washington)",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "Chai-1",
@@ -109,7 +180,8 @@
     "repoUrl": "https://github.com/chaidiscovery/chai-lab",
     "summary": "From Chai Discovery. Competitive with AlphaFold 3 on protein–ligand interaction prediction. Weights are openly available, making it one of the most accessible multi-modal structure prediction tools.",
     "developer": "Chai Discovery",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "Boltz-1",
@@ -123,7 +195,8 @@
     "repoUrl": "https://github.com/jwohlwend/boltz",
     "summary": "An openly available alternative to AlphaFold 3 for biomolecular structure prediction. Achieves comparable accuracy on protein–ligand and protein–nucleic acid complexes while being fully open-source.",
     "developer": "MIT",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "DiffDock",
@@ -137,7 +210,8 @@
     "repoUrl": "https://github.com/gcorso/DiffDock",
     "summary": "Reimagines molecular docking as a generative problem rather than a search/scoring problem. Generates binding poses by diffusing over translations, rotations, and torsion angles. From MIT CSAIL.",
     "developer": "MIT CSAIL",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "HelixDock",
@@ -151,7 +225,8 @@
     "repoUrl": "https://github.com/PaddlePaddle/PaddleHelix",
     "summary": "From Baidu Research. Pre-trained on a large corpus of protein–ligand complexes to learn binding interactions. Part of the PaddleHelix framework for biomolecular computing.",
     "developer": "Baidu Research",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "GNINA",
@@ -165,7 +240,8 @@
     "repoUrl": "https://github.com/gnina/gnina",
     "summary": "Extends the traditional AutoDock Vina framework with deep learning-based scoring. One of the most established ML-enhanced docking tools, widely used in computational drug discovery.",
     "developer": "University of Pittsburgh",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "Evo",
@@ -179,7 +255,24 @@
     "repoUrl": "https://github.com/evo-design/evo",
     "summary": "A 7B-parameter model trained on 2.7M prokaryotic and phage genomes. Can generate functional gene sequences, predict mutation effects, and design novel CRISPR systems. From the Arc Institute and Stanford.",
     "developer": "Arc Institute / Stanford",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "generative",
+      "evaluationLadderMax": 8,
+      "evaluationLadderDistribution": [0, 1, 3, 8],
+      "unitOfEvaluation": "Per-sequence (gene-level)",
+      "unitIndependenceNote": "Generated sequences tested independently; functional assays on CRISPR designs",
+      "selectionFunnelRatio": "Thousands generated, dozens functionally tested",
+      "pipelineComponents": ["StripedHyena backbone (7B params)"],
+      "creditAssignment": "Single end-to-end model",
+      "failuresEnumerated": false,
+      "sotaBaselineNamed": "Nucleotide Transformer, DNABERT-2",
+      "ablationPresent": true,
+      "interventionalEvidence": true,
+      "statedScope": "All DNA biology across the tree of life",
+      "effectiveScope": "Prokaryotic and phage genomes; eukaryotic performance less validated",
+      "dualUseNote": "Authors discuss biosecurity implications; capable of generating functional gene sequences"
+    }
   },
   {
     "name": "Chroma",
@@ -193,7 +286,8 @@
     "repoUrl": "https://github.com/generatebio/chroma",
     "summary": "From Generate Biomedicines. Designs proteins conditioned on natural-language descriptions, symmetry specifications, shape constraints, and substructure motifs. Weights available under a non-commercial licence.",
     "developer": "Generate Biomedicines",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "ProGen2",
@@ -207,7 +301,24 @@
     "repoUrl": "https://github.com/salesforce/progen",
     "summary": "From Salesforce Research. Generates novel proteins by learning the grammar of amino acid sequences from 1B+ proteins. Experimentally validated — generated lysozyme variants showed functional enzymatic activity.",
     "developer": "Salesforce Research",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "generative",
+      "evaluationLadderMax": 8,
+      "evaluationLadderDistribution": [1, 6, 8],
+      "unitOfEvaluation": "Per-sequence",
+      "unitIndependenceNote": "Generated lysozymes tested individually; small n for experimental validation",
+      "selectionFunnelRatio": "Many generated, 5 experimentally characterised",
+      "pipelineComponents": ["Autoregressive transformer"],
+      "creditAssignment": "Single end-to-end model",
+      "failuresEnumerated": false,
+      "sotaBaselineNamed": "ProGen (v1), ProtGPT2",
+      "ablationPresent": true,
+      "interventionalEvidence": true,
+      "statedScope": "General protein sequence generation",
+      "effectiveScope": "Experimentally validated on lysozymes only; broader claims based on in silico metrics",
+      "dualUseNote": null
+    }
   },
   {
     "name": "BindCraft",
@@ -221,7 +332,24 @@
     "repoUrl": "https://github.com/martinpacesa/BindCraft",
     "summary": "Combines AlphaFold 2, ProteinMPNN, and optimisation routines to design binders without expert intervention. Experimentally validated binders achieved nanomolar affinity against multiple targets including PD-L1.",
     "developer": "Weizmann Institute / Francis Crick Institute",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": {
+      "claimType": "generative",
+      "evaluationLadderMax": 8,
+      "evaluationLadderDistribution": [1, 6, 7, 8],
+      "unitOfEvaluation": "Per-design / per-target",
+      "unitIndependenceNote": "Multiple designs per target; target-level success is the meaningful unit",
+      "selectionFunnelRatio": "Thousands generated per target, ~100 tested per target experimentally",
+      "pipelineComponents": ["AF2 (hallucination/optimisation)", "ProteinMPNN (sequence design)", "AF2 (in silico filter)", "Rosetta (energy filtering)"],
+      "creditAssignment": "Novel contribution is the automated pipeline and optimisation strategy; component models are inherited",
+      "failuresEnumerated": true,
+      "sotaBaselineNamed": "RFdiffusion + ProteinMPNN pipeline",
+      "ablationPresent": true,
+      "interventionalEvidence": true,
+      "statedScope": "Automated binder design against arbitrary protein targets",
+      "effectiveScope": "Validated on 12 diverse targets; nanomolar affinity achieved for most",
+      "dualUseNote": null
+    }
   },
   {
     "name": "NetMHCpan 4.1",
@@ -235,7 +363,8 @@
     "repoUrl": null,
     "summary": "The gold-standard tool for MHC-I binding prediction, hosted by IEDB. Neural network trained on experimental binding data. Academic use via web server; standalone download requires registration.",
     "developer": "DTU Health Tech",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "IgFold",
@@ -249,7 +378,8 @@
     "repoUrl": "https://github.com/Graylab/IgFold",
     "summary": "From Johns Hopkins. Uses protein language model embeddings to predict antibody structures in seconds, including the notoriously difficult CDR-H3 loop. Fast enough for high-throughput screening of antibody repertoires.",
     "developer": "Gray Lab (Johns Hopkins University)",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "SaProt",
@@ -263,7 +393,8 @@
     "repoUrl": "https://github.com/westlake-repl/SaProt",
     "summary": "From Westlake University. Encodes proteins as structure-aware sequences by interleaving amino acids with Foldseek structural alphabet tokens. Outperforms ESM-2 on 10 of 11 downstream tasks.",
     "developer": "Westlake University",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   },
   {
     "name": "Nucleotide Transformer",
@@ -277,6 +408,7 @@
     "repoUrl": "https://github.com/instadeepai/nucleotide-transformer",
     "summary": "From InstaDeep. Trained on 3,200+ genomes spanning the tree of life. Available in sizes from 50M to 2.5B parameters. Performs well on 18 genomics benchmark tasks including promoter prediction and splice site detection.",
     "developer": "InstaDeep",
-    "riskScore": null
+    "riskScore": null,
+    "evaluation": null
   }
 ]
