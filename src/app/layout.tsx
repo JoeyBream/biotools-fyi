@@ -55,12 +55,12 @@ export default function RootLayout({
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             Built by{' '}
             <a
-              href="https://sentinelbio.org"
+              href="https://www.armadillobio.com"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-foreground"
             >
-              Sentinel Bio
+              Armadillo Bio
             </a>
             . Model data from{' '}
             <a
