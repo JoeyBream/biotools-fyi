@@ -71,6 +71,7 @@ export const ALL_TAGS = [
   'Immune modelling / vaccine design',
   'Experimental automation',
   'Protein language model',
+  'Other',
 ] as const
 
 export type Tag = (typeof ALL_TAGS)[number]

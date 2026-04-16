@@ -11,12 +11,15 @@ import { isFullyOpen } from './OpenSourceBadge'
 type SortKey = 'name' | 'year'
 type SortDir = 'asc' | 'desc'
 
+const PAGE_SIZE = 50
+
 export default function Dashboard({ tools }: { tools: Tool[] }) {
   const [query, setQuery] = useState('')
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
   const [openSourceOnly, setOpenSourceOnly] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const toggleTag = (tag: string) => {
     setActiveTags((prev) => {
@@ -25,6 +28,7 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
       else next.add(tag)
       return next
     })
+    setVisibleCount(PAGE_SIZE)
   }
 
   const toggleSort = (key: SortKey) => {
@@ -57,6 +61,9 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
       })
   }, [tools, query, activeTags, openSourceOnly, sortKey, sortDir])
 
+  const visible = filtered.slice(0, visibleCount)
+  const hasMore = visibleCount < filtered.length
+
   // Which tags are actually present in the data
   const usedTags = useMemo(() => {
     const s = new Set<string>()
@@ -77,7 +84,10 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
           type="text"
           placeholder="Search tools by name, function, or tag\u2026"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setVisibleCount(PAGE_SIZE)
+          }}
           className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary text-sm"
         />
       </div>
@@ -99,7 +109,10 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
             <input
               type="checkbox"
               checked={openSourceOnly}
-              onChange={(e) => setOpenSourceOnly(e.target.checked)}
+              onChange={(e) => {
+                setOpenSourceOnly(e.target.checked)
+                setVisibleCount(PAGE_SIZE)
+              }}
               className="rounded border-border"
             />
             Fully open source only
@@ -111,6 +124,7 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
                 setActiveTags(new Set())
                 setOpenSourceOnly(false)
                 setQuery('')
+                setVisibleCount(PAGE_SIZE)
               }}
               className="text-sm text-primary hover:underline"
             >
@@ -123,6 +137,7 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
       {/* Results count */}
       <p className="text-sm text-muted mb-4">
         {filtered.length} tool{filtered.length !== 1 ? 's' : ''}
+        {hasMore && ` (showing ${visibleCount})`}
       </p>
 
       {/* Table */}
@@ -154,7 +169,7 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {filtered.map((tool) => (
+            {visible.map((tool) => (
               <tr
                 key={tool.slug}
                 className="hover:bg-surface transition-colors"
@@ -198,6 +213,19 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
           </tbody>
         </table>
       </div>
+
+      {/* Load more */}
+      {hasMore && (
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            className="px-6 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary-light transition-colors"
+          >
+            Show more ({filtered.length - visibleCount} remaining)
+          </button>
+        </div>
+      )}
     </div>
   )
 }

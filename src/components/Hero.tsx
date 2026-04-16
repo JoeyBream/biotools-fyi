@@ -6,9 +6,9 @@ export default function Hero() {
           Find the right AI biology tool for your research
         </h1>
         <p className="mt-3 text-lg text-muted max-w-2xl">
-          A curated directory of AI-enabled tools for structural biology, protein
-          design, genomics, and drug discovery — with open-source status and
-          provenance for every entry.
+          A searchable directory of 385+ AI-enabled tools for structural
+          biology, protein design, genomics, and drug discovery — with
+          open-source status, provenance, and evidence quality for every entry.
         </p>
       </div>
     </section>

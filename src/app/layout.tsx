@@ -62,7 +62,16 @@ export default function RootLayout({
             >
               Sentinel Bio
             </a>
-            . Data sourced from public literature and repositories.
+            . Model data from{' '}
+            <a
+              href="https://epoch.ai/blog/expanding-our-analysis-of-biological-ai-models"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              Epoch AI
+            </a>
+            {' '}and public literature.
           </div>
         </footer>
       </body>
