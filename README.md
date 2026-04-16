@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# biotools.fyi
 
-## Getting Started
+A live, searchable directory of AI-enabled biological tools — their capabilities, open-source status, and evidence quality.
 
-First, run the development server:
+Informed by the methodology from the [Global Risk Index for AI-enabled Biological Tools](https://doi.org/10.71172/wjyw-6dyc) (CLTR & RAND Europe, 2025) and the [Epoch AI biological models dataset](https://epoch.ai/blog/expanding-our-analysis-of-biological-ai-models).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Who is this for?
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Biology researchers:** Find the right AI tool for your use case — protein engineering, drug design, genomics, docking — with provenance and open-source status for every entry.
+- **Policy folks:** See our categorisation of tools to understand the landscape. Filter by tag, openness, and evidence quality.
+- **Model developers:** See how your model fits in the landscape and what evidence standards others are meeting.
+- **Evaluators:** See which models have been validated experimentally and at what level.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What's in the directory?
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+385+ tools, each with:
 
-## Learn More
+- **Tags** — protein structure prediction, protein design, molecular docking, genomics, drug design, antibody design, immune modelling, and more.
+- **Open-source status** — code, weights, and data availability tracked separately.
+- **Evidence quality** (where assessed) — claim type, evaluation ladder rung (0–11 from self-consistency to clinical validation), unit of evaluation, selection funnel, pipeline decomposition, stated vs. effective scope.
+- **Provenance** — developer, country, year, paper and repo links.
 
-To learn more about Next.js, take a look at the following resources:
+## Data sources
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Epoch AI** — 365 biology models from their [biological AI models dataset](https://epoch.ai/blog/expanding-our-analysis-of-biological-ai-models).
+- **Hand-curated** — 20 tools with detailed summaries, repo links, and evidence quality assessments.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Status
 
-## Deploy on Vercel
+Live at [biodesign-index.vercel.app](https://biodesign-index.vercel.app). Domain (biotools.fyi) pending.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Evidence quality assessments populated for 7 tools so far. Tag taxonomy is intentionally flexible — designed to evolve with biologist collaborators.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Licence
+
+MIT
+
+## Contact
+
+Joey Bream — joey@sentinelbio.org
