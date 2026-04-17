@@ -10,7 +10,7 @@ cd ingest
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-export ANTHROPIC_API_KEY=sk-ant-...
+cp .env.example .env        # then paste your API key into .env
 
 # Run the pipeline on papers (DOIs or bioRxiv URLs)
 python run_pipeline.py 10.1101/2024.01.01.123456 10.1101/2024.02.02.654321
@@ -29,9 +29,10 @@ python run_pipeline.py --file papers.txt
 
 ```bash
 source ingest/.venv/bin/activate
-export ANTHROPIC_API_KEY=sk-ant-...
 python ingest/run_pipeline.py DOI1 DOI2 DOI3
 ```
+
+The API key is loaded automatically from `ingest/.env`.
 
 This will print a CSV table with columns: status, name, function, tags, developer, countries, year, open_source_code/weights/data, claim_type, confidence, doi, summary.
 

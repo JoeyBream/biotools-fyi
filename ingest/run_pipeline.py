@@ -24,7 +24,7 @@ Usage:
 
 Prerequisites:
     pip install -r requirements.txt
-    export ANTHROPIC_API_KEY=sk-ant-...
+    cp .env.example .env   # then add your API key
 """
 
 import argparse
@@ -38,6 +38,25 @@ import sys
 from pathlib import Path
 
 import requests
+
+
+def _load_dotenv() -> None:
+    """Load .env file from the ingest directory if it exists."""
+    env_path = Path(__file__).resolve().parent / ".env"
+    if not env_path.exists():
+        return
+    with open(env_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            key, _, value = line.partition("=")
+            key, value = key.strip(), value.strip()
+            if key and key not in os.environ:
+                os.environ[key] = value
+
+
+_load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
