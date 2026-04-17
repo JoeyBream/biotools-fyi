@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# python
+.venv/
+__pycache__/
+
+# ingest pipeline data (generated, not committed)
+ingest/data/*.jsonl
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
