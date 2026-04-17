@@ -100,6 +100,15 @@ export default async function ToolPage(props: PageProps<'/tools/[slug]'>) {
             <p className="text-sm">{tool.year}</p>
           </div>
 
+          {tool.citations !== null && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
+                Citations
+              </h3>
+              <p className="text-sm">{tool.citations.toLocaleString('en-GB')}</p>
+            </div>
+          )}
+
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
               Country

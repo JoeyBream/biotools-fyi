@@ -14,6 +14,7 @@ export interface Tool {
   repoUrl: string | null
   summary: string
   developer: string
+  citations: number | null
   riskScore: number | null
   evaluation: EvaluationProfile | null
 }

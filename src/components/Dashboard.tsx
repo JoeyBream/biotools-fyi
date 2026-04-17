@@ -8,17 +8,22 @@ import TagBadge from './TagBadge'
 import OpenSourceBadge from './OpenSourceBadge'
 import { isFullyOpen } from './OpenSourceBadge'
 
-type SortKey = 'name' | 'year'
+type SortKey = 'name' | 'year' | 'citations'
 type SortDir = 'asc' | 'desc'
 
 const PAGE_SIZE = 50
+
+function formatCitations(n: number | null): string {
+  if (n === null) return '\u2014'
+  return n.toLocaleString('en-GB')
+}
 
 export default function Dashboard({ tools }: { tools: Tool[] }) {
   const [query, setQuery] = useState('')
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
   const [openSourceOnly, setOpenSourceOnly] = useState(false)
-  const [sortKey, setSortKey] = useState<SortKey>('name')
-  const [sortDir, setSortDir] = useState<SortDir>('asc')
+  const [sortKey, setSortKey] = useState<SortKey>('citations')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const toggleTag = (tag: string) => {
@@ -36,7 +41,7 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
     } else {
       setSortKey(key)
-      setSortDir(key === 'year' ? 'desc' : 'asc')
+      setSortDir(key === 'name' ? 'asc' : 'desc')
     }
   }
 
@@ -57,14 +62,20 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
       .sort((a, b) => {
         const mul = sortDir === 'asc' ? 1 : -1
         if (sortKey === 'name') return mul * a.name.localeCompare(b.name)
-        return mul * (a.year - b.year)
+        if (sortKey === 'year') return mul * (a.year - b.year)
+        // Citations: nulls always last
+        const ac = a.citations ?? -1
+        const bc = b.citations ?? -1
+        if (ac === -1 && bc === -1) return a.name.localeCompare(b.name)
+        if (ac === -1) return 1
+        if (bc === -1) return -1
+        return mul * (ac - bc)
       })
   }, [tools, query, activeTags, openSourceOnly, sortKey, sortDir])
 
   const visible = filtered.slice(0, visibleCount)
   const hasMore = visibleCount < filtered.length
 
-  // Which tags are actually present in the data
   const usedTags = useMemo(() => {
     const s = new Set<string>()
     tools.forEach((t) => t.tags.forEach((tag) => s.add(tag)))
@@ -151,6 +162,12 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
               >
                 Tool{sortArrow('name')}
               </th>
+              <th
+                className="text-right px-4 py-3 font-medium text-muted cursor-pointer select-none hover:text-foreground hidden sm:table-cell"
+                onClick={() => toggleSort('citations')}
+              >
+                Citations{sortArrow('citations')}
+              </th>
               <th className="text-left px-4 py-3 font-medium text-muted hidden md:table-cell">
                 Tags
               </th>
@@ -160,11 +177,8 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
               >
                 Year{sortArrow('year')}
               </th>
-              <th className="text-left px-4 py-3 font-medium text-muted hidden sm:table-cell">
-                Open source
-              </th>
               <th className="text-left px-4 py-3 font-medium text-muted hidden lg:table-cell">
-                Developer
+                Open source
               </th>
             </tr>
           </thead>
@@ -185,6 +199,9 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
                     {tool.function}
                   </p>
                 </td>
+                <td className="px-4 py-3 text-right text-muted tabular-nums hidden sm:table-cell">
+                  {formatCitations(tool.citations)}
+                </td>
                 <td className="px-4 py-3 hidden md:table-cell">
                   <div className="flex flex-wrap gap-1">
                     {tool.tags.map((tag) => (
@@ -195,11 +212,8 @@ export default function Dashboard({ tools }: { tools: Tool[] }) {
                 <td className="px-4 py-3 text-muted hidden sm:table-cell">
                   {tool.year}
                 </td>
-                <td className="px-4 py-3 hidden sm:table-cell">
+                <td className="px-4 py-3 hidden lg:table-cell">
                   <OpenSourceBadge openSource={tool.openSource} />
-                </td>
-                <td className="px-4 py-3 text-muted hidden lg:table-cell">
-                  {tool.developer}
                 </td>
               </tr>
             ))}
