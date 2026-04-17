@@ -100,12 +100,22 @@ export default async function ToolPage(props: PageProps<'/tools/[slug]'>) {
             <p className="text-sm">{tool.year}</p>
           </div>
 
-          {tool.citations !== null && (
+          {(tool.citations !== null || tool.githubStars !== null) && (
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
-                Citations
+                Usage
               </h3>
-              <p className="text-sm">{tool.citations.toLocaleString('en-GB')}</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                {tool.citations !== null && (
+                  <span>{tool.citations.toLocaleString('en-GB')} citations</span>
+                )}
+                {tool.githubStars !== null && (
+                  <span>{tool.githubStars.toLocaleString('en-GB')} GitHub stars</span>
+                )}
+                {tool.githubForks !== null && (
+                  <span>{tool.githubForks.toLocaleString('en-GB')} forks</span>
+                )}
+              </div>
             </div>
           )}
 

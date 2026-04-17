@@ -15,6 +15,8 @@ export interface Tool {
   summary: string
   developer: string
   citations: number | null
+  githubStars: number | null
+  githubForks: number | null
   riskScore: number | null
   evaluation: EvaluationProfile | null
 }
