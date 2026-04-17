@@ -84,7 +84,18 @@ Respond with a JSON object matching this schema exactly:
     "data": "yes | no | partial | restricted | n/a"
   }},
   "summary": "2-3 sentence summary of what the tool does and why it matters",
-  "claimType": "generative | predictive | diagnostic | benchmark | methodological | infrastructure | null"
+  "claimType": "generative | predictive | diagnostic | benchmark | methodological | infrastructure | null",
+
+  "designedProteins": {{
+    "didDesignAndValidate": true or false,
+    "count": number or null,
+    "validationMethods": ["list of how designs were validated, e.g. 'X-ray crystallography', 'CD spectroscopy', 'SPR binding assay', 'yeast display', 'thermal shift'"],
+    "validationSummary": "one-sentence summary of what was validated and how"
+  }},
+
+  "targetTypes": ["exhaustive list of protein/molecule types the tool was applied to or designed for, e.g. 'de novo miniproteins', 'enzyme active sites', 'nanobodies', 'coiled-coils', 'membrane proteins', 'protein-protein interfaces', 'metalloenzymes'"],
+
+  "pdbCodes": ["list of PDB accession codes mentioned in the paper, e.g. '7MRX', '8ABC'. Empty list if none mentioned."]
 }}
 
 Allowed tags (pick 1-3):
@@ -95,6 +106,9 @@ Rules:
 - "countries" should be ISO 3166-1 alpha-2 codes (US, GB, CN, etc.) for the primary affiliation(s).
 - For "openSource", check whether the paper mentions a GitHub repo, model weights, or data release. If unknown, default to "no".
 - "claimType" describes what the tool claims to do: generate sequences/structures (generative), predict properties (predictive), classify/diagnose (diagnostic), compare tools (benchmark), introduce a method (methodological), or provide infrastructure.
+- For "designedProteins": did the authors actually design new proteins and experimentally validate them? If so, how many designs were tested, and what validation was performed? If the paper is purely computational with no wet-lab validation, set didDesignAndValidate to false.
+- For "targetTypes": be exhaustive. List every type of protein, molecule, or biological target the tool was applied to, tested on, or designed for. Include both broad categories (e.g. "enzymes") and specific types mentioned (e.g. "PET hydrolases", "TIM barrels").
+- For "pdbCodes": list ALL PDB accession codes mentioned anywhere in the paper (deposited structures, reference structures, benchmarks). Use the 4-character code format. If none are mentioned, return an empty list.
 - If a field genuinely cannot be determined from the information given, use null.
 
 Title: {{{{title}}}}
@@ -133,7 +147,7 @@ def extract_from_paper(client, title: str, abstract: str, authors: str) -> dict 
 
     message = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=1024,
+        max_tokens=2048,
         messages=[{"role": "user", "content": prompt}],
     )
 
@@ -190,6 +204,10 @@ def build_tool_record(extraction: dict, source: dict) -> dict:
         "githubForks": None,
         "riskScore": None,
         "evaluation": None,
+        # Deep extraction fields
+        "_designedProteins": extraction.get("designedProteins"),
+        "_targetTypes": extraction.get("targetTypes") or [],
+        "_pdbCodes": extraction.get("pdbCodes") or [],
         # Metadata for review
         "_extraction": {
             "claimType": extraction.get("claimType"),

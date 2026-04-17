@@ -82,16 +82,25 @@ def resolve_doi(raw: str) -> str:
     return raw
 
 
-def fetch_paper_metadata(doi: str) -> dict | None:
-    """Fetch title and abstract from bioRxiv API for a DOI."""
-    # Try bioRxiv first
+def _reconstruct_abstract(inverted_index: dict) -> str:
+    """Reconstruct abstract text from OpenAlex's inverted index format."""
+    if not inverted_index or not isinstance(inverted_index, dict):
+        return ""
+    word_positions = []
+    for word, positions in inverted_index.items():
+        for pos in positions:
+            word_positions.append((pos, word))
+    word_positions.sort()
+    return " ".join(word for _, word in word_positions)
+
+
+def _try_biorxiv(doi: str) -> dict | None:
+    """Try fetching from bioRxiv API."""
     url = f"https://api.biorxiv.org/details/biorxiv/{doi}"
-    log.info("Fetching metadata for %s", doi)
     try:
         resp = requests.get(url, timeout=30)
         resp.raise_for_status()
-        data = resp.json()
-        collection = data.get("collection", [])
+        collection = resp.json().get("collection", [])
         if collection:
             paper = collection[0]
             return {
@@ -103,17 +112,54 @@ def fetch_paper_metadata(doi: str) -> dict | None:
                 "category": paper.get("category", ""),
             }
     except Exception as e:
-        log.warning("bioRxiv lookup failed for %s: %s", doi, e)
+        log.debug("bioRxiv: %s — %s", doi, e)
+    return None
 
-    # Fallback: try CrossRef
+
+def _try_openalex(doi: str) -> dict | None:
+    """Try fetching from OpenAlex (best for abstracts)."""
+    url = f"https://api.openalex.org/works/doi:{doi}"
+    headers = {"User-Agent": "biotools-fyi-ingestor/0.1 (mailto:joey@armadillobio.com)"}
     try:
-        url = f"https://api.crossref.org/works/{doi}"
+        resp = requests.get(url, headers=headers, timeout=30)
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        work = resp.json()
+
+        title = work.get("title", "")
+        abstract = _reconstruct_abstract(work.get("abstract_inverted_index"))
+
+        authors = "; ".join(
+            a.get("author", {}).get("display_name", "")
+            for a in work.get("authorships", [])
+            if a.get("author", {}).get("display_name")
+        )
+
+        pub_date = work.get("publication_date", "")
+
+        return {
+            "doi": doi,
+            "title": title,
+            "abstract": abstract,
+            "authors": authors,
+            "date": pub_date,
+            "category": "",
+        }
+    except Exception as e:
+        log.debug("OpenAlex: %s — %s", doi, e)
+    return None
+
+
+def _try_crossref(doi: str) -> dict | None:
+    """Try fetching from CrossRef (fallback, often missing abstracts)."""
+    url = f"https://api.crossref.org/works/{doi}"
+    try:
         resp = requests.get(url, timeout=30, headers={"User-Agent": "biotools-fyi/0.1"})
         resp.raise_for_status()
         item = resp.json().get("message", {})
         title = " ".join(item.get("title", []))
         abstract = item.get("abstract", "")
-        # Strip HTML tags from CrossRef abstract
         abstract = re.sub(r"<[^>]+>", "", abstract)
         authors = "; ".join(
             f"{a.get('family', '')}, {a.get('given', '')}"
@@ -128,8 +174,27 @@ def fetch_paper_metadata(doi: str) -> dict | None:
             "category": "",
         }
     except Exception as e:
-        log.warning("CrossRef lookup also failed for %s: %s", doi, e)
+        log.debug("CrossRef: %s — %s", doi, e)
+    return None
 
+
+def fetch_paper_metadata(doi: str) -> dict | None:
+    """Fetch title and abstract, trying bioRxiv -> OpenAlex -> CrossRef."""
+    log.info("Fetching metadata for %s", doi)
+
+    # Try sources in order of abstract quality
+    for source_name, fetcher in [
+        ("bioRxiv", _try_biorxiv),
+        ("OpenAlex", _try_openalex),
+        ("CrossRef", _try_crossref),
+    ]:
+        result = fetcher(doi)
+        if result and result.get("title"):
+            log.info("  -> got metadata from %s (abstract: %d chars)",
+                     source_name, len(result.get("abstract", "")))
+            return result
+
+    log.warning("Could not fetch metadata for %s from any source.", doi)
     return None
 
 
@@ -186,7 +251,10 @@ def results_to_csv(results: list[dict]) -> str:
     fields = [
         "status", "name", "function", "tags", "developer", "countries",
         "year", "open_source_code", "open_source_weights", "open_source_data",
-        "claim_type", "confidence", "doi", "summary", "reason",
+        "claim_type", "confidence", "doi",
+        "designed_and_validated", "designs_count", "validation_methods",
+        "validation_summary", "target_types", "pdb_codes",
+        "summary", "reason",
     ]
 
     output = io.StringIO()
@@ -197,6 +265,7 @@ def results_to_csv(results: list[dict]) -> str:
         status = r.get("_status") or r.get("status", "unknown")
         os_info = r.get("openSource", {})
         extraction = r.get("_extraction", {})
+        designed = r.get("_designedProteins") or {}
 
         row = {
             "status": status,
@@ -212,6 +281,12 @@ def results_to_csv(results: list[dict]) -> str:
             "claim_type": extraction.get("claimType", ""),
             "confidence": extraction.get("screen_confidence") or r.get("confidence", ""),
             "doi": extraction.get("source_doi") or r.get("doi", ""),
+            "designed_and_validated": designed.get("didDesignAndValidate", ""),
+            "designs_count": designed.get("count", ""),
+            "validation_methods": "; ".join(designed.get("validationMethods") or []),
+            "validation_summary": designed.get("validationSummary", ""),
+            "target_types": "; ".join(r.get("_targetTypes") or []),
+            "pdb_codes": "; ".join(r.get("_pdbCodes") or []),
             "summary": r.get("summary", ""),
             "reason": r.get("reason", ""),
         }
